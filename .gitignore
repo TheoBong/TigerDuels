@@ -1,38 +1,38 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-target/classes/com/bongbong/mineage/Arena.class
-target/classes/com/bongbong/mineage/DuelsPlugin.class
-target/classes/com/bongbong/mineage/impl/AcceptDuelCommand.class
-target/classes/com/bongbong/mineage/impl/AcceptInviteCommand.class
-target/classes/com/bongbong/mineage/impl/CancelDuelCommand.class
-target/classes/com/bongbong/mineage/impl/DuelCommand.class
-target/classes/com/bongbong/mineage/impl/EndDuelCommand.class
-target/classes/com/bongbong/mineage/impl/EventListener.class
-target/classes/com/bongbong/mineage/impl/InviteCommand.class
-target/classes/com/bongbong/mineage/impl/SpectateCommand.class
-target/classes/com/bongbong/mineage/impl/State.class
-target/classes/com/bongbong/mineage/impl/TaskScheduler.class
-target/classes/com/bongbong/mineage/kit/KitLoadout.class
-target/classes/com/bongbong/mineage/kit/KitType.class
-target/classes/com/bongbong/mineage/match/Match$1.class
-target/classes/com/bongbong/mineage/match/Match.class
-target/classes/com/bongbong/mineage/match/MatchFunctions.class
-target/classes/com/bongbong/mineage/match/MatchPlayer.class
-target/classes/com/bongbong/mineage/match/MatchState.class
-target/classes/com/bongbong/mineage/match/MatchTask.class
-target/classes/com/bongbong/mineage/match/MatchTeam.class
-target/classes/com/bongbong/mineage/utils/InventoryUtil.class
-target/classes/com/bongbong/mineage/utils/ItemBuilder.class
-target/classes/com/bongbong/mineage/utils/JavaUtils.class
-target/classes/com/bongbong/mineage/utils/NumberUtil.class
-target/classes/com/bongbong/mineage/utils/StringUtil.class
-target/classes/com/bongbong/mineage/utils/TimeUtil.class
-target/classes/plugin.yml
-target/dependency-reduced-pom.xml
-target/Duels.jar
-target/maven-archiver/pom.properties
-target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
-target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
-target/original-Duels.jar
-target/classes/plugin.yml
-target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
-.idea/vcs.xml
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
