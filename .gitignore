@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+target/classes/plugin.yml
+target/classes/plugin.yml
+.idea/vcs.xml
