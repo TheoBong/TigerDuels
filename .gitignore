@@ -39,3 +39,5 @@ build/
 target/classes/plugin.yml
 target/classes/plugin.yml
 .idea/vcs.xml
+.idea/workspace.xml
+.idea/misc.xml
