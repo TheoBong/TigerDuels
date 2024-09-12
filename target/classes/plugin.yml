@@ -1,0 +1,5 @@
+name: TigerDuels
+description: Duels for Mineage
+version: git-TigerDuels-unknown
+authors: [tigerbong]
+main: com.bongbong.mineage.DuelsPlugin
