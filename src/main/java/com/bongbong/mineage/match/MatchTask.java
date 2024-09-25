@@ -16,7 +16,7 @@ public class MatchTask extends BukkitRunnable {
     public void run() {
         this.action--;
 
-        if (!match.getState().equals(MatchState.STARTING)) return;
+        if (match.getState() != MatchState.STARTING) return;
 
         if (action == 0) {
             match.setState(MatchState.PLAYING);

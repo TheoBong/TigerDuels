@@ -15,8 +15,8 @@ public class MatchTeam {
 
     public List<MatchPlayer> getAllPlayers() {
         List<MatchPlayer> list = new ArrayList<>();
-        list.add(leader);
-        list.addAll(followers);
+        list.add(getLeader());
+        list.addAll(getFollowers());
         return list;
     }
 

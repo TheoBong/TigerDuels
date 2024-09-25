@@ -1,6 +1,7 @@
 package com.bongbong.mineage.match;
 
 import com.bongbong.mineage.Arena;
+import com.bongbong.mineage.EconomyHook;
 import com.bongbong.mineage.kit.KitType;
 import com.bongbong.mineage.utils.TimeUtil;
 import lombok.Getter;
@@ -12,7 +13,11 @@ import org.bukkit.entity.Player;
 import java.util.*;
 
 @Getter
-public class Match {
+public abstract class Match {
+
+    static final String WARNING = "Teleporting away/disconnecting will cancel the duel.";
+    static final String INVITE = "Invite your teammates using /di <name>!";
+
     private final UUID id;
     private final KitType kit;
     private final int wager, size;
@@ -28,31 +33,44 @@ public class Match {
         this.size = size;
     }
 
+    public abstract void onStart();
+    public abstract void onEnd();
+
     public void duelInitiated(Player initiator) {
+        EconomyHook.takeMoney(initiator, wager);
+
         MatchPlayer matchPlayer = new MatchPlayer(initiator);
+        MatchFunctions.savePlayerInitials(matchPlayer);
 
         teams.add(new MatchTeam(matchPlayer));
-        initiator.teleport(Arena.ARENA_MIDDLE);
-        MatchFunctions.setupWaiter(matchPlayer);
 
-        initiator.sendMessage("Teleporting away/disconnecting will cancel the duel.");
+        initiator.teleport(Arena.ARENA_MIDDLE);
+        MatchFunctions.strip(initiator);
+
+        initiator.sendMessage(WARNING);
+        if (size > 0 ) initiator.sendMessage(INVITE);
 
         setState(MatchState.WAITING);
     }
 
-    public boolean duelAccepted(Player acceptor) {
+    public void duelAccepted(Player acceptor) {
+        EconomyHook.takeMoney(acceptor, wager);
+
         MatchPlayer matchPlayer = new MatchPlayer(acceptor);
+        MatchFunctions.savePlayerInitials(matchPlayer);
+
+        for (MatchTeam team : teams)
+            if (team.getLeader().equals(matchPlayer)) return;
 
         teams.add(new MatchTeam(matchPlayer));
 
-        if (size < 0) {
-            acceptor.teleport(Arena.ARENA_SPAWN_2);
-            return true;
-        } else {
-            acceptor.teleport(Arena.ARENA_MIDDLE);
-            MatchFunctions.setupWaiter(matchPlayer);
-            acceptor.sendMessage("Teleporting away/disconnecting will cancel the duel.");
-            return false;
+        MatchFunctions.strip(acceptor);
+        acceptor.teleport(Arena.ARENA_MIDDLE);
+
+        if (checkReady()) onStart();
+        else {
+            acceptor.sendMessage(WARNING);
+            if (size > 0 ) acceptor.sendMessage(INVITE);
         }
     }
 
@@ -63,25 +81,33 @@ public class Match {
         return inviteId;
     }
 
-    public boolean addPlayer(Player player, UUID inviteId) {
+    public void addPlayer(Player player, UUID inviteId) {
         MatchTeam invitedTeam = invites.get(inviteId);
+
+        if (state != MatchState.WAITING) {
+            player.sendMessage("The duel is not in the waiting stage anymore.");
+            return;
+        }
 
         if (invitedTeam.getFollowers().size() > size) {
             player.sendMessage("The duel you are trying to join is full.");
-            return false;
+            return;
         }
 
         MatchPlayer matchPlayer = new MatchPlayer(player);
+        MatchFunctions.savePlayerInitials(matchPlayer);
+
         invitedTeam.addFollower(matchPlayer);
 
+        player.teleport(Arena.ARENA_MIDDLE);
+        MatchFunctions.strip(player);
+
         if (checkReady()) {
-            return true;
-        } else {
-            player.teleport(Arena.ARENA_MIDDLE);
-            MatchFunctions.setupWaiter(matchPlayer);
-            player.sendMessage("Teleporting away/disconnecting will be the same as leaving the duel.");
-            return false;
+            onStart();
+            return;
         }
+
+        player.sendMessage("Teleporting away/disconnecting will be the same as leaving the duel.");
     }
 
     public void leave(Player player) {
@@ -131,17 +157,24 @@ public class Match {
         return ready;
     }
 
-    public void cancelDuel() {
+    void cancelDuel() {
+        returnWagers();
         sendMessage("Duel cancelled.");
-        cleanup();
+        onEnd();
+    }
+
+    void returnWagers() {
+        for (MatchTeam team : teams)
+            EconomyHook.addMoney(team.getLeader().getPlayer(), wager);
     }
 
     public void startPlaying() {
         boolean first = true;
 
-        for (MatchTeam team : teams) {
+        for (MatchTeam team : getTeams()) {
             for (MatchPlayer matchPlayer : team.getAllPlayers()) {
                 Player player = matchPlayer.getPlayer();
+                MatchFunctions.strip(player);
 
                 // teleport to arena spawn locations
                 player.teleport(first ? Arena.ARENA_SPAWN_1 : Arena.ARENA_SPAWN_2);
@@ -154,26 +187,22 @@ public class Match {
     }
 
     public void cleanup() {
-        for (MatchTeam matchTeam : teams) {
+        for (MatchTeam matchTeam : teams)
             for (MatchPlayer matchPlayer : matchTeam.getAllPlayers()) {
                 if (matchPlayer.isDead()) continue;
 
                 MatchFunctions.resetPlayer(matchPlayer);
                 MatchFunctions.showAllOtherPlayers(matchPlayer.getPlayer());
             }
-        }
 
         teams.clear();
     }
 
     public void endMatch() {
+        returnWagers();
         sendMessage("Your duel is ended by an admin. Wagers have been refunded and this match is void.");
 
-        for (MatchTeam team : teams) {
-            // give back both team leader wagers
-        }
-
-        cleanup();
+        onEnd();
     }
 
 
@@ -182,23 +211,26 @@ public class Match {
         matchPlayer.setDead(true);
 
         MatchFunctions.resetPlayer(matchPlayer);
+
         // warp to top of coliseum and (possibly) spectate the match
 
         // (possibly) /spectate will require you to be in coliseum region and will hide every player other than
         // the match you are spectating until you (a) leave coliseum or (b) match ends
 
-        this.checkForWinners();
+        checkForWinners();
     }
 
     public void checkForWinners() {
-
         MatchTeam aliveTeam = null;
         int alive = 0;
         for (MatchTeam team : this.teams) {
             boolean teamAlive = false;
-            for (MatchPlayer matchPlayer : team.getAllPlayers()) {
-                if (!matchPlayer.isDead()) teamAlive = true;
-            }
+
+            for (MatchPlayer matchPlayer : team.getAllPlayers())
+                if (!matchPlayer.isDead()) {
+                    teamAlive = true;
+                    break;
+                }
 
             if (teamAlive) {
                 alive++;
@@ -206,15 +238,16 @@ public class Match {
             }
         }
 
+        if (alive == 0) {
+            onEnd();
+            return;
+        }
+
         if (alive == 1) {
-            for (MatchPlayer matchPlayer : aliveTeam.getAllPlayers()) {
+            EconomyHook.addMoney(aliveTeam.getLeader().getPlayer(), (wager * 2));
 
-                if (wager != 0) {
-                }
-                // logic for giving money to leader
-
+            for (MatchPlayer matchPlayer : aliveTeam.getAllPlayers())
                 matchPlayer.getPlayer().sendMessage("You won!");
-            }
 
             MatchTeam losingTeam = null;
 
@@ -223,54 +256,43 @@ public class Match {
 
             assert losingTeam != null;
 
-            for (MatchPlayer matchPlayer : losingTeam.getAllPlayers()) {
-
-                if (wager != 0) {
-                }
-                // logic for giving money to leader
-
+            for (MatchPlayer matchPlayer : losingTeam.getAllPlayers())
                 matchPlayer.getPlayer().sendMessage("You lost!");
-            }
 
-            cleanup();
+            onEnd();
         }
     }
 
     public MatchPlayer getPlayer(Player player) {
-        for (MatchTeam team : getTeams()) {
+        for (MatchTeam team : getTeams())
             for (MatchPlayer mPlayer : team.getAllPlayers())
                 if (mPlayer.getPlayer() == player) return mPlayer;
-        }
+
         return null;
     }
 
     public List<MatchPlayer> getOpponents(Player player) {
         List<MatchPlayer> list = new ArrayList<>();
 
-        for (MatchTeam team : getTeams()) {
-            for (MatchPlayer mPlayer : team.getAllPlayers()) {
+        for (MatchTeam team : getTeams())
+            for (MatchPlayer mPlayer : team.getAllPlayers())
                 if (mPlayer.getPlayer() != player) list.add(mPlayer);
-            }
-        }
 
         return list;
     }
 
     public void sendMessage(String msg) {
-        for (MatchTeam team : this.teams) {
-            for (MatchPlayer matchPlayer : team.getAllPlayers()) {
+        for (MatchTeam team : this.teams)
+            for (MatchPlayer matchPlayer : team.getAllPlayers())
                 if (!matchPlayer.isDead()) matchPlayer.getPlayer().sendMessage(msg);
-            }
-        }
     }
 
     public void sendSound(Sound sound, float vol, float pit) {
-        for (MatchTeam team : this.teams) {
+        for (MatchTeam team : this.teams)
             for (MatchPlayer matchPlayer : team.getAllPlayers()) {
                 Location location = matchPlayer.getPlayer().getLocation();
                 matchPlayer.getPlayer().playSound(location, sound, vol, pit);
             }
-        }
     }
 
     public String getDuration() {

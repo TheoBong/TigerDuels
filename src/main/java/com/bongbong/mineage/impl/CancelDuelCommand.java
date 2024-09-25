@@ -8,7 +8,7 @@ import com.bongbong.mineage.match.MatchState;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
-@CommandAlias("cancelduel|leaveduel|ff")
+@CommandAlias("cancelduel|cancel|forfeit|ff")
 @RequiredArgsConstructor
 public class CancelDuelCommand extends BaseCommand {
     final State state;
@@ -18,7 +18,7 @@ public class CancelDuelCommand extends BaseCommand {
         Match match = state.getMatch(sender);
 
         if (match == null) {
-            sender.sendMessage("You are not waiting for a match");
+            sender.sendMessage("You are not in a match");
             return;
         }
 
@@ -28,6 +28,7 @@ public class CancelDuelCommand extends BaseCommand {
         }
 
         match.forfeit(sender);
+        sender.sendMessage("You forfeited.");
     }
 
 }

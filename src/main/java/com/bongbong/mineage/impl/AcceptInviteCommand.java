@@ -36,10 +36,7 @@ public class AcceptInviteCommand extends BaseCommand {
             return;
         }
 
-        if (match.addPlayer(sender, inviteId)) {
-            taskScheduler.runTaskTimer(new MatchTask(match), 0L, 20L);
-            match.startPlaying();
-        }
+        match.addPlayer(sender, inviteId);
     }
 
 }

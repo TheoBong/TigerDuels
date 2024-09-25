@@ -28,7 +28,7 @@ public final class InventoryUtil {
         return out.toString();
     }
 
-    public static ItemStack[] deserializeInvetory(final String in) {
+    public static ItemStack[] deserializeInventory(final String in) {
         final List<ItemStack> items = new ArrayList<>();
         final String[] split = in.split(";");
 

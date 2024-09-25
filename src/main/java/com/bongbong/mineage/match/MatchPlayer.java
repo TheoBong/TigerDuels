@@ -1,21 +1,29 @@
 package com.bongbong.mineage.match;
 
 import lombok.Data;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+
+import java.util.Collection;
 
 @Data
 public class MatchPlayer {
     private final Player player;
 
-    private boolean disconnected;
-    private boolean dead;
-    private int hits;
-    private int combo;
-    private int longestCombo;
-    private int potionsThrown;
-    private int potionsMissed;
-    private ItemStack[] inventory;
+    private boolean disconnected, dead;
+    private int potionsThrown, potionsMissed, longestCombo, combo, hits;
+
+    private String initialInventory, initialArmor;
+    private double initialHealth;
+    private int initialFood;
+    private boolean initialFly;
+    private GameMode initialGamemode;
+    private Location initialLocation;
+    private Collection<PotionEffect> initialPotionEffects;
 
     public MatchPlayer(Player player) {
         this.player = player;
