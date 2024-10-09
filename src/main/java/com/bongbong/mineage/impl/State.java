@@ -37,13 +37,10 @@ public class State {
     }
 
     Match getMatch(Player player) {
-        for (Match match : globalMatches.values()) {
-            for (MatchTeam team : match.getTeams()) {
-                for (MatchPlayer matchPlayer : team.getAllPlayers()) {
+        for (Match match : globalMatches.values())
+            for (MatchTeam team : match.getTeams())
+                for (MatchPlayer matchPlayer : team.getAllPlayers())
                     if (matchPlayer.getPlayer() == player) return match;
-                }
-            }
-        }
 
         return null;
     }
@@ -53,5 +50,9 @@ public class State {
             if (match.getInvites().get(inviteId) != null) return match;
 
         return null;
+    }
+
+    public void shutdown() {
+        for (Match match : getMatches()) match.endMatch();
     }
 }

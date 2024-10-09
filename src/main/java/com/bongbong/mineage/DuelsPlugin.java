@@ -3,6 +3,7 @@ package com.bongbong.mineage;
 import co.aikar.commands.PaperCommandManager;
 import com.bongbong.mineage.impl.*;
 import com.bongbong.mineage.kit.KitType;
+import com.bongbong.mineage.match.Match;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,10 +13,11 @@ import java.util.logging.Level;
 public class DuelsPlugin extends JavaPlugin {
 
     public static final String ADMIN_PERMISSION = "duels.admin";
+    private State state;
 
     @Override
     public void onEnable() {
-        State state = new State(new HashMap<>());
+        state = new State(new HashMap<>());
         TaskScheduler scheduler = new TaskScheduler(this, getServer().getScheduler());
 
         KitType.init();
@@ -32,6 +34,11 @@ public class DuelsPlugin extends JavaPlugin {
         commandManager.registerCommand(new InviteCommand(state));
 
         registerListener(new EventListener(state));
+    }
+
+    @Override
+    public void onDisable() {
+        state.shutdown();
     }
 
     public void registerListener(Listener listener) {

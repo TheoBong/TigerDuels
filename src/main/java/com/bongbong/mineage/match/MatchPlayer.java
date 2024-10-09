@@ -20,7 +20,6 @@ public class MatchPlayer {
     private String initialInventory, initialArmor;
     private double initialHealth;
     private int initialFood;
-    private boolean initialFly;
     private GameMode initialGamemode;
     private Location initialLocation;
     private Collection<PotionEffect> initialPotionEffects;

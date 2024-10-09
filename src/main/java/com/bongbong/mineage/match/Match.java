@@ -44,6 +44,8 @@ public abstract class Match {
 
         teams.add(new MatchTeam(matchPlayer));
 
+        MatchFunctions.hideAllOtherPlayers(initiator);
+        MatchFunctions.showPlayersInMatch(this);
         initiator.teleport(Arena.ARENA_MIDDLE);
         MatchFunctions.strip(initiator);
 
@@ -65,6 +67,8 @@ public abstract class Match {
         teams.add(new MatchTeam(matchPlayer));
 
         MatchFunctions.strip(acceptor);
+        MatchFunctions.hideAllOtherPlayers(acceptor);
+        MatchFunctions.showPlayersInMatch(this);
         acceptor.teleport(Arena.ARENA_MIDDLE);
 
         if (checkReady()) onStart();
@@ -99,6 +103,8 @@ public abstract class Match {
 
         invitedTeam.addFollower(matchPlayer);
 
+        MatchFunctions.hideAllOtherPlayers(player);
+        MatchFunctions.showPlayersInMatch(this);
         player.teleport(Arena.ARENA_MIDDLE);
         MatchFunctions.strip(player);
 
@@ -122,7 +128,7 @@ public abstract class Match {
                     if (matchPlayer.getPlayer() == player) team.removeFollower(matchPlayer);
                     // hopefully no concurrent modification exception
 
-                    MatchFunctions.resetPlayer(matchPlayer);
+                    MatchFunctions.revertPlayerInitials(matchPlayer);
                     player.sendMessage("You left the duel in the waiting stage.");
                     return;
                 }
@@ -191,7 +197,7 @@ public abstract class Match {
             for (MatchPlayer matchPlayer : matchTeam.getAllPlayers()) {
                 if (matchPlayer.isDead()) continue;
 
-                MatchFunctions.resetPlayer(matchPlayer);
+                MatchFunctions.revertPlayerInitials(matchPlayer);
                 MatchFunctions.showAllOtherPlayers(matchPlayer.getPlayer());
             }
 
@@ -210,7 +216,7 @@ public abstract class Match {
         matchPlayer.getPlayer().sendMessage("You died.");
         matchPlayer.setDead(true);
 
-        MatchFunctions.resetPlayer(matchPlayer);
+        MatchFunctions.revertPlayerInitials(matchPlayer);
 
         // warp to top of coliseum and (possibly) spectate the match
 

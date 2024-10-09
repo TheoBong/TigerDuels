@@ -115,10 +115,6 @@
                             <pattern>co.aikar.locales</pattern>
                             <shadedPattern>com.bongbong.mineage.duels.co.aikar.locales</shadedPattern> <!-- Replace this -->
                         </relocation>
-                        <relocation>
-                            <pattern>net.milkbowl.vault</pattern>
-                            <shadedPattern>com.bongbong.mineage.duels.net.milkbowl.vault</shadedPattern> <!-- Replace this -->
-                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
