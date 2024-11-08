@@ -1,0 +1,5 @@
+name: TigerDuels-spigot-impl
+description: Duels for Mineage
+version: ${duels.desc}
+authors: [tigerbong]
+main: com.bongbong.mineage.duels.spigot.DuelsSpigot

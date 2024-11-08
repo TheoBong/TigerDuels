@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.bongbong.mineage.duels.proto";
+option java_outer_classname = "MoneyProto";
+
+package money;
+
+service MoneyService {
+  rpc GetBalance (BalanceRequest) returns (BalanceReply) {}
+  rpc PostWager (WagerRequest) returns (WagerReply) {}
+}
+
+message WagerRequest {
+  string winnerUuid = 1;
+  string loserUuid = 2;
+  double wager = 3;
+}
+
+message WagerReply {
+  bool success = 1;
+}
+
+message BalanceRequest {
+  string uuid = 1;
+}
+
+message BalanceReply {
+  double balance = 2;
+}

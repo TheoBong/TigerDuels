@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.bongbong.mineage.duels.proto";
+option java_outer_classname = "MatchProto";
+
+package match;
+
+service MatchService {
+  rpc PostPlayerDie (PlayerRequest) returns (SuccessResponse) {}
+
+  rpc PostPlayerJoin (PlayerJoinRequest) returns (SuccessResponse) {}
+  rpc PostMatchStart (MatchStartRequest) returns (SuccessResponse) {}
+
+}
+
+message SuccessResponse {
+  bool success = 1;
+}
+
+message PlayerRequest {
+  string player = 1;
+}
+
+message PlayerJoinRequest {
+  string leader = 1;
+  string teammates = 2;
+  string enemies = 3;
+  string player = 4;
+}
+
+message MatchStartRequest {
+  string playersTeam1 = 1;
+  string playersTeam2 = 2;
+  string kit = 3;
+}

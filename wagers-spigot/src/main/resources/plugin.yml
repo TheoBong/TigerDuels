@@ -1,0 +1,6 @@
+name: Duels-Wagers
+description: The wager component for duels plugin.
+version: ${wagers.desc}
+depend: [Vault, Essentials]
+author: tigerbong
+main: com.bongbong.mineage.duels.wagers.WagersPlugin

@@ -1,6 +1,0 @@
-name: TigerDuels
-description: Duels for Mineage
-version: ${duels.desc}
-authors: [tigerbong]
-depend: [Vault, Essentials]
-main: com.bongbong.mineage.DuelsPlugin
